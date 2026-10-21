@@ -1,0 +1,82 @@
+@font-face{font-family:KukuPixel;src:url('DotGothic16-Regular.ttf') format('truetype');font-style:normal;font-weight:400;font-display:swap}
+/* One shared game world: pixel type, textured wood and square paper signs. */
+:root{font-family:KukuPixel,monospace;font-synthesis:weight;--green:#426e26;--dark:#39250f;--lime:#f4df9e;--border:#64512d;color:#35250f;background:#4497eb}
+body{background:#408426 url('voxel-grass.svg') center/96px repeat}
+main{max-width:540px;background:linear-gradient(#65a8f8 0 170px,#65a8f800 380px),url('voxel-grass.svg') center/96px repeat;min-height:100dvh}
+body,button,input,textarea,select,#home.voxel-home,#home .voxel-number,#home #levels button,#home #extra-ten{font-family:KukuPixel,monospace;font-synthesis:weight}
+button,input,textarea,select,.panel,.section-title,.scoreboard,.stadium,.counter,.photo-settings img,.file-button,footer,.script,.notice,#parents>p.muted{border-radius:0!important}
+button,.file-button{min-height:52px;border:0;box-shadow:none;background:transparent url('voxel-wood.png') center/100% 145% no-repeat;color:#30200d;font-weight:400;text-shadow:.65px 0 #30200d;line-height:1.4;padding:10px 20px}
+button:active:not(:disabled){transform:translateY(3px);box-shadow:none}
+button:disabled{opacity:.5;box-shadow:none}
+button.primary,button.outline,button.soft,.sound,button.quiet,.compact{border:0;box-shadow:none;background:transparent url('voxel-wood.png') center/100% 145% no-repeat;color:#30200d;text-shadow:.65px 0 #30200d}
+button.primary{font-size:22px}
+button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid #fff3a9;outline-offset:2px}
+.app-header{padding:3px 0 9px;gap:6px}
+.app-header a,.app-header .quiet{color:#fff;text-shadow:2px 2px #27639b}
+.app-header #open-parent{border:0;background:none;color:#fff;font-size:13px}
+.sound-toggle,.sound-toggle[aria-pressed=false]{background:transparent url('voxel-wood.png') center/100% 145% no-repeat!important;border:0;box-shadow:none;color:#30200d;text-shadow:.65px 0 #30200d;font-size:14px}
+.section-title{border:0;background:none;padding:0 0 6px;box-shadow:none;color:#fff;text-shadow:2px 2px #355526}
+.section-title h2{font-size:23px}.section-title .quiet{min-height:42px;padding:6px 13px;font-size:13px}
+.counter{color:#fff;background:#315422cc;border:2px solid #a4bd76;padding:4px 10px;text-shadow:none;font-size:16px!important}
+.panel{background:#f3e6c3;border:4px solid #5d4928;border-top-color:#b49a65;border-left-color:#b49a65;box-shadow:4px 5px #203b2066;padding:16px}
+h2,h3{font-weight:400;text-shadow:.7px 0 currentColor}.muted{color:#594a32}label{font-weight:400;color:#44331b}
+input:not([type=checkbox]),textarea,select{background:#fff8e5;border:2px solid #a28a60;color:#35250f;font-size:16px}
+input[type=range]{accent-color:#547b30}input[type=checkbox]{accent-color:#547b30}
+footer{background:#284d25e6;border:0;color:#fff;font-size:13px}footer label,footer .footer-note,footer .muted{color:#e5ecca}
+.file-button,.script{color:#35250f}.script{background:#e6d6ac}.file-button{background:transparent url('voxel-wood.png') center/100% 145% no-repeat}
+#parents>p.muted{background:#f3e6c3;border:0;box-shadow:3px 3px #203b2066;font-size:13px}
+#parents .section-title h2{font-size:20px}#parents details>summary{font-size:18px}#parents .photo-settings img{border:3px solid #a28a60}
+#parents table{background:#fff4d9;color:#35250f}#parents td,#parents th{border-color:#b6a178}
+#learn .learn-controls{background:#f3e6c3}#learn-guide{font-size:17px}#learn .speed-label{font-size:16px}
+.chant-row{position:relative;border:3px solid #a38b59;border-bottom:5px solid #77623e;box-shadow:2px 3px #213d2166;background:#f7ebcf;min-height:82px;padding:12px;color:#35250f;font-weight:400}
+.chant-row b{font-size:29px;font-weight:400;text-shadow:.8px 0 currentColor}.chant-row small{font-size:17px;color:#514127}.chant-row .row-num{color:#695939}
+.chant-row.active{background:#d4e9aa;border-color:#fff9cc;box-shadow:0 0 0 3px #527532}.chant-row .speaker{width:24px;height:24px}
+/* Match the approved home lettering and wood material. */
+#home.voxel-home,#home.voxel-home button,#home.voxel-home h2,#home .voxel-number,#home #levels button,#home #extra-ten{font-family:KukuPixel,monospace}
+#home .voxel-title{font-family:KukuPixel,monospace;font-size:24px;font-weight:400;text-shadow:1px 0 #fff,0 2px #27639b}
+#home .voxel-title>span{font-weight:400;letter-spacing:.025em}
+#home .mode,#home .mode.selected,#home #start,.voxel-name{background:transparent url('voxel-wood.png') center/100% 145% no-repeat;border:0;box-shadow:none;filter:none}
+#home .mode{min-height:61px;padding:6px 5px 13px}#home .mode.selected{filter:brightness(1.12)}
+#home .mode b{font-family:KukuPixel,monospace;font-weight:400;font-size:clamp(21px,5.8vw,29px);text-shadow:1px 0 #30200d,0 1px #30200d;letter-spacing:0}
+#home #start{min-height:86px;padding:9px 12px 19px;font-size:38px;font-weight:400;text-shadow:1px 0 #30200d,0 1px #30200d;letter-spacing:.025em}
+#home .voxel-menu h2{font-family:KukuPixel,monospace;font-weight:400;font-size:20px;text-shadow:1px 0 #fff,0 2px #2b501d}
+#home #levels button,#home #extra-ten{font-family:KukuPixel,monospace;font-weight:400;font-size:31px;text-shadow:1px 0 #30200d,0 1px #30200d;padding-top:4px;min-height:54px}
+.voxel-name{padding:9px 12px 11px;font-family:KukuPixel,monospace;font-size:14px;text-shadow:.6px 0 #30200d}
+#home .voxel-number{font-size:clamp(23px,7vw,37px);font-weight:400;text-shadow:1px 0 #102c47,0 1px #102c47;color:#102c47}
+#home #selection-note{font-size:14px}#home #home-stats{font-size:12px}
+/* The playing field uses matching voxel players, not the old flat characters. */
+body.game-active main{background:linear-gradient(#6aa6edaa,#366a24bb),url('voxel-grass.svg') center/96px repeat}
+#game .section-title{padding:0;margin-bottom:4px}#game .section-title>span{font-size:13px}#game .section-title .compact{min-height:32px;padding:3px 14px}
+#game .scoreboard{border:0;box-shadow:none;background:#27431fe8;color:#ffdf8e;padding:5px 4px;margin:0 0 7px;outline:2px solid #8aab59;outline-offset:-2px}
+#game .scoreboard b{font-family:KukuPixel,monospace;font-size:28px;font-weight:400;line-height:1.1;text-shadow:1px 0 #fff}#game .scoreboard span{font-weight:400;font-size:11px;line-height:1.3}
+#game .stadium{background:#549a2c url('voxel-pitch.png') center/cover no-repeat;border:0;box-shadow:0 4px #294e23;height:clamp(165px,29dvh,215px);overflow:hidden}
+#game .net,#game .pitch-circle,#game .stands{display:none}
+#game .player{width:158px;height:158px;display:block;transform-origin:center bottom}
+#game .voxel-sprite{position:absolute;inset:0;background:url('voxel-players.png') left center/200% 100% no-repeat;pointer-events:none}
+#game .keeper .voxel-sprite{background-position:right center}
+#game .player img{display:none}#game .player img[src^="blob:"]{display:block;position:absolute;left:39%;top:23%;width:30%;height:29%;object-fit:cover;border:2px solid #c9e0e1;box-shadow:none;z-index:2}
+#game .keeper img[src^="blob:"]{left:33%;top:22%;width:35%;height:31%}
+#game .player .legs{display:none}#game .player .shirt{position:absolute;left:44%;top:52%;width:auto;height:auto;min-width:23px;line-height:1;clip-path:none;margin:0;background:none!important;color:#15375a;font-family:KukuPixel,monospace;font-size:20px;font-weight:400;text-shadow:.7px 0 #15375a;transform:rotate(14deg);z-index:1}
+#game .keeper .shirt{display:none}
+#game .player-name{position:absolute;top:auto;bottom:0;left:20%;max-width:105px;padding:2px 8px 5px;border:0;background:#f5dfa8;color:#35250f;box-shadow:2px 2px #4d3c1c;border-radius:0;font-family:KukuPixel,monospace;font-size:12px;line-height:1.2;font-weight:400;z-index:3}
+#game .striker{left:calc(23% - 79px);top:22px;--actor-scale:1;transform:scale(var(--actor-scale))}
+#game .keeper{left:calc(77% - 79px);top:19px;--keeper-scale:.77;transform:scale(var(--keeper-scale))}
+#game .shot-ball{left:45%;top:73%;width:31px;height:31px}
+#game .saving .keeper::before,#game .saving .keeper::after{display:none}
+#game .question-panel{background:#f8eccd;border:3px solid #917747;border-bottom:5px solid #584526;box-shadow:3px 4px #213d2166;padding:10px 12px;gap:5px 8px;margin-top:10px}
+#game .equation{font-family:KukuPixel,monospace;color:#302411;font-size:37px;line-height:1.3;font-weight:400;text-shadow:.8px 0 #302411;letter-spacing:0}
+#game .reading{font-family:KukuPixel,monospace;color:#35250f;font-size:21px;font-weight:400;line-height:1.4}
+#game #repeat{border:0;background:transparent url('voxel-wood.png') center/100% 145% no-repeat;box-shadow:none;font-family:KukuPixel,monospace;color:#30200d;min-height:43px;padding:7px 14px 10px;font-size:16px}
+#game .feedback{font-size:16px;font-weight:400;color:#4d3921}
+#game .answers{gap:7px;margin:4px -3px 1px}
+#game .answers button,#game .answers button:nth-child(2),#game .answers button:nth-child(3){min-height:72px;background:transparent url('voxel-wood.png') center/100% 145% no-repeat;border:0;box-shadow:none;color:#30200d;font-family:KukuPixel,monospace;font-size:37px;font-weight:400;text-shadow:1px 0 #30200d,0 1px #30200d;padding:8px 4px 15px}
+#game .answers button.correct{outline:3px solid #539137;outline-offset:-5px;filter:brightness(1.15);opacity:1}
+#game #next{border:0;background:transparent url('voxel-wood.png') center/100% 145% no-repeat;box-shadow:none;font-family:KukuPixel,monospace;color:#30200d;min-height:54px;font-size:22px;padding:8px 12px 15px;margin-top:5px}
+#game .goal-banner,#game .save-banner{border:0;inset:32px 9% auto;padding:14px 10px 19px;box-shadow:none;background:transparent url('voxel-wood.png') center/100% 145% no-repeat;color:#30200d;font-family:KukuPixel,monospace;font-size:29px;font-weight:400;text-shadow:1px 0 #30200d;-webkit-text-stroke:0;transform:rotate(-4deg)}
+#game .save-banner{font-size:24px;transform:rotate(3deg)}#game .save-banner span{font-family:KukuPixel,monospace;font-size:13px;color:#4d3921}
+#finish{padding-top:20px}#finish .finish-panel{background:#f3e6c3;border:5px solid #a38a59;border-bottom-color:#5d472a;border-right-color:#5d472a;box-shadow:5px 6px #203b2066;padding:25px 16px}
+#finish h1{color:#4b6428;font-family:KukuPixel,monospace;font-weight:400;font-size:40px;text-shadow:1px 0 #4b6428,0 2px #fff}
+#finish .eyebrow{color:#6c5125;font-family:KukuPixel,monospace;font-size:15px;letter-spacing:.08em}#finish .trophy{width:120px;height:120px;filter:drop-shadow(4px 4px #bba36f)}#finish .trophy img{width:100%;height:100%}
+#finish-message{font-size:19px;color:#35250f}
+@media(max-height:670px){#game .stadium{height:165px}#game .player{width:146px;height:146px}#game .striker{--actor-scale:.91;left:calc(23% - 73px);top:15px}#game .keeper{--keeper-scale:.71;left:calc(77% - 73px);top:10px}#game .question-panel{padding:6px 9px}#game .equation{font-size:31px}#game .reading{font-size:18px}#game .answers button,#game .answers button:nth-child(2),#game .answers button:nth-child(3){min-height:64px;font-size:32px}}
+@media(max-width:350px){#home .mode b{font-size:22px}#home #start{font-size:33px}#home #levels button,#home #extra-ten{font-size:27px}#game .equation{font-size:29px}#game .reading{font-size:18px}#game .scoreboard span{font-size:10px}#game .answers button,#game .answers button:nth-child(2),#game .answers button:nth-child(3){font-size:31px}#game #repeat{padding-left:10px;padding-right:10px;font-size:14px}}
