@@ -16,7 +16,7 @@ function updateHome(){
  setText('home-stats',`ゴール ${state.practice.goals}かい ／ ${state.practice.shots}シュート ・ きいた くく ${state.practice.listened}かい`);
  setText('hero-name',state.settings.name);setText('shirt-number',state.settings.number);setText('home-shirt-number',state.settings.number);
  document.querySelectorAll('[data-name]').forEach(el=>el.textContent=state.settings[el.dataset.name]);
- const soundOn=state.settings.voiceOn&&state.settings.goalSoundOn;setText('sound-toggle',soundOn?'🔊 おと ON':'🔇 おとをつける');$('sound-toggle').setAttribute('aria-pressed',String(soundOn));
+ const soundOn=state.settings.voiceOn&&state.settings.goalSoundOn;setText('sound-toggle',soundOn?'おと ON':'おとをつける');$('sound-toggle').setAttribute('aria-pressed',String(soundOn));
  $('goal-voice-on').checked=state.settings.goalSoundOn;$('voice-on').checked=state.settings.voiceOn;Voice.setup(state.settings);if(typeof BGM!=='undefined')BGM.setup(state.settings);
 }
 function selectLevel(level){selected=level;document.querySelectorAll('[data-level]').forEach(button=>{const yes=Number(button.dataset.level)===level;button.classList.toggle('selected',yes);button.setAttribute('aria-pressed',String(yes));});$('recommended').classList.toggle('selected',level==='recommended');$('recommended').setAttribute('aria-pressed',String(level==='recommended'));setText('selection-note',level===10?'10の だんは「じゅう かける…」で よむよ。':selectionLabel());}
@@ -26,8 +26,8 @@ async function openListen(pool){
  setText('learn-guide',pool.length===1?'もういちど いっしょに いってみよう。':'こえに あわせて いってみよう。');
  $('chant-list').replaceChildren();
  for(const q of listenPool){const b=document.createElement('button');b.className='chant-row';b.dataset.question=q.id;b.setAttribute('aria-label',`${q.a}かける${q.b}。${q.full}。きく`);
- const num=document.createElement('span');num.className='row-num';num.textContent=q.a+'のだん';const content=document.createElement('span');const eq=document.createElement('b');eq.textContent=`${q.a} × ${q.b} = ${q.value}`;const reading=document.createElement('small');reading.textContent=q.full;content.append(eq,reading);const speaker=document.createElement('span');speaker.className='speaker';speaker.textContent='🔊';b.append(num,content,speaker);b.addEventListener('click',()=>playSingle(q));$('chant-list').append(b);}
- setText('play-all','▶ じゅんばんに きく');
+ const num=document.createElement('span');num.className='row-num';num.textContent=q.a+'のだん';const content=document.createElement('span');const eq=document.createElement('b');eq.textContent=`${q.a} × ${q.b} = ${q.value}`;const reading=document.createElement('small');reading.textContent=q.full;content.append(eq,reading);const speaker=document.createElement('img');speaker.className='speaker';speaker.src='ui-speaker.svg';speaker.alt='';speaker.setAttribute('aria-hidden','true');b.append(num,content,speaker);b.addEventListener('click',()=>playSingle(q));$('chant-list').append(b);}
+ setText('play-all','じゅんばんに きく');
 }
 function highlight(id){document.querySelectorAll('.chant-row').forEach(el=>{const active=el.dataset.question===id;el.classList.toggle('active',active);el.setAttribute('aria-current',active?'true':'false');});}
 async function noteListen(){state.practice.listened++;await persist();updateHome();}
@@ -38,12 +38,12 @@ async function playAll(){
   if(ticket!==flow||!continuous)return;listenPosition=i;const q=listenPool[i];highlight(q.id);
   document.querySelector(`[data-question="${q.id}"]`)?.scrollIntoView({block:'nearest',behavior:'smooth'});
   const ok=await Voice.chant(q);if(ticket!==flow)return;
-  if(!ok){continuous=false;highlight(null);setText('play-all','▶ ここから きく');return;}
+  if(!ok){continuous=false;highlight(null);setText('play-all','ここから きく');return;}
   if(state.settings.voiceOn&&state.settings.studyVolume>0)await noteListen();await wait(450);if(ticket!==flow)return;
  }
- continuous=false;listenPosition=0;highlight(null);setText('play-all','▶ もういちど きく');
+ continuous=false;listenPosition=0;highlight(null);setText('play-all','もういちど きく');
 }
-function stopAll(){flow++;continuous=false;Voice.stop();highlight(null);setText('play-all','▶ ここから きく');}
+function stopAll(){flow++;continuous=false;Voice.stop();highlight(null);setText('play-all','ここから きく');}
 function beginGame(pool,review=false){
  if(!pool.length){go('home');return;}roundPool=[...pool];isReview=review;
  roundScore={goals:0,shots:0,saves:0};updateScore();queue=chooseQuestions(pool,state.settings.count,state.history);position=0;go('game');renderQuestion();
