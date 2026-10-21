@@ -83,9 +83,8 @@ async function answerQuestion(value,button){
  $('retry-tools').hidden=true;$('listen-help').hidden=true;$('save-banner').hidden=true;setText('equation',q.a+' × '+q.b+' = '+q.value);setText('reading',q.full);setText('feedback','せいかい！ シュート！');
  $('stadium').classList.remove('saving','shooting');void $('stadium').offsetWidth;$('stadium').classList.add('shooting');
  try{
-  const encouragement=(async()=>{await Voice.cheer('correct');if(ticket!==flow)return false;await Voice.cheer('shoot');return ticket===flow;})();
   await wait(850);if(ticket!==flow)return;$('goal-banner').hidden=false;makeConfetti();showNext();
-  if(!(await encouragement)||ticket!==flow)return;const goalPlayback=Voice.goal();await Voice.crowd();await goalPlayback;if(ticket!==flow)return;
+  const goalPlayback=Voice.goal();await Voice.crowd();await goalPlayback;if(ticket!==flow)return;
   await Voice.chant(q);
  }finally{if(ticket===flow)showNext();}
 }
