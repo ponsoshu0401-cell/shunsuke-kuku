@@ -1,0 +1,37 @@
+/* v17: the miss and goal have different, measurable end points. */
+#game .kick-target,#game .catch-target{position:absolute;width:1px;height:1px;pointer-events:none;visibility:hidden}
+#game .kick-target{left:78%;top:88%}#game .catch-target{left:50%;top:54%}
+#game .shot-ball{left:var(--ball-sx,34%);top:var(--ball-sy,80%);width:36px;height:36px;transform:translate(-50%,-50%);filter:drop-shadow(1px 4px 2px #153b3e66);z-index:5}
+#game .shot-ball .ball-art{width:100%;height:100%;object-fit:contain}
+#game .ball-shadow{position:absolute;left:var(--ball-sx,34%);top:calc(var(--ball-sy,80%) + 14px);width:28px;height:7px;border-radius:50%!important;background:#1d482d66;transform:translateX(-50%);filter:blur(1px);pointer-events:none;z-index:0}
+#game .shooting .shot-ball{animation:voxel-goal .80s cubic-bezier(.2,.55,.5,1) forwards}
+#game .saving .shot-ball{animation:voxel-save .75s ease-out forwards}
+#game .shooting .keeper{animation:voxel-missed-dive .80s ease-out forwards}
+#game .saving .keeper{animation:voxel-intercept .75s ease-out forwards;z-index:4}
+#game .saving .keeper .voxel-sprite{background:url('voxel-keeper-catch.png') center/contain no-repeat}
+#game .shooting .ball-shadow,#game .saving .ball-shadow{animation:voxel-shadow .35s ease-out forwards}
+#game .goal-banner{inset:4px 11% auto;font-size:23px;padding:6px 10px 12px;transform:rotate(-3deg);z-index:7;pointer-events:none}
+#game .save-banner{inset:auto 4px 2px;font-size:17px;padding:4px 8px 9px;transform:none;z-index:7;pointer-events:none}
+#game .save-banner span{display:none}
+@keyframes voxel-goal{
+ 0%{left:var(--ball-sx);top:var(--ball-sy);transform:translate(-50%,-50%) scale(1) rotate(0deg)}
+ 55%{left:var(--arc-x);top:var(--arc-y);transform:translate(-50%,-50%) scale(.78) rotate(160deg)}
+ 90%{left:var(--goal-x);top:var(--goal-y);transform:translate(-50%,-50%) scale(.52) rotate(330deg)}
+ 100%{left:var(--goal-x);top:calc(var(--goal-y) + 3px);transform:translate(-50%,-50%) scale(.53) rotate(350deg)}
+}
+@keyframes voxel-save{
+ 0%{left:var(--ball-sx);top:var(--ball-sy);transform:translate(-50%,-50%) scale(1) rotate(0deg)}
+ 42%{left:var(--save-arc-x);top:var(--save-arc-y);transform:translate(-50%,-50%) scale(.86) rotate(140deg)}
+ 72%{left:var(--save-x);top:var(--save-y);transform:translate(-50%,-50%) scale(.71) rotate(235deg)}
+ 100%{left:var(--save-x);top:var(--save-y);transform:translate(-50%,-50%) scale(.71) rotate(235deg)}
+}
+@keyframes voxel-intercept{
+ 0%{transform:translateX(0) scale(var(--keeper-scale))}
+ 72%,100%{transform:translateX(var(--save-dx)) scale(var(--keeper-scale))}
+}
+@keyframes voxel-missed-dive{
+ 0%{transform:translateX(0) rotate(0) scale(var(--keeper-scale))}
+ 65%,100%{transform:translateX(var(--dive-dx)) rotate(-29deg) scale(var(--keeper-scale))}
+}
+@keyframes voxel-shadow{to{opacity:0;transform:translateX(-50%) scale(.25)}}
+@media(prefers-reduced-motion:reduce){#game .shot-ball,#game .keeper,#game .ball-shadow{animation-duration:.01ms!important}}

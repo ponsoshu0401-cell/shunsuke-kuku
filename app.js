@@ -54,7 +54,7 @@ function renderQuestion(){
  setText('game-mode',mode==='speak'?'つづきを いおう':isReview?'ふくしゅう':'くくシュート！');setText('counter',`${position+1} / ${queue.length}`);
  setText('question-guide',mode==='speak'?'こえに だして いってみよう':'つづきは なあに？');setText('equation',`${current.a} × ${current.b} = ？`);setText('reading',current.prompt+'…？');setText('feedback','');
  $('answers').hidden=mode==='speak';$('reveal').hidden=mode!=='speak';$('reveal').disabled=false;$('next').hidden=true;$('retry-tools').hidden=true;$('listen-help').hidden=true;
- renderChoices();
+ renderChoices();if(typeof ShotMotion!=='undefined')ShotMotion.prepare();
  (async()=>{await Voice.cheer('question');if(ticket!==flow)return;await Voice.chant(current,true);})();
 }
 function renderChoices(){
@@ -65,7 +65,7 @@ function renderChoices(){
 }
 function recoverSave(){phase='question';$('repeat').disabled=false;[...$('answers').children].forEach(b=>b.disabled=false);$('retry-tools').hidden=false;$('listen-help').hidden=(state.history[current.id]?.wrongStreak||0)<2;setText('feedback','だいじょうぶ！ もういちど できるよ。');}
 async function answerQuestion(value,button){
- if(phase!=='question')return;Voice.unlock();const q=current;const ticket=++flow;Voice.stop();
+ if(phase!=='question')return;Voice.unlock();const q=current;const ticket=++flow;Voice.stop();if(typeof ShotMotion!=='undefined')ShotMotion.prepare();
  roundScore.shots++;state.practice.shots++;updateScore();
  if(value!==q.value){
   phase='saving';hadWrong=true;roundScore.saves++;state.practice.saves++;updateScore();
