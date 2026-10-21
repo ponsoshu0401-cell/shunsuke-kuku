@@ -206,7 +206,7 @@ function safeState(saved){
 async function boot(){
  $('start').disabled=true;
  await Store.open();state=safeState(await Store.get('state'));Voice.setup(state.settings);
- if(typeof BundledCheers!=='undefined')$('native-audio-check').src=URL.createObjectURL(BundledCheers.blob('goal'));
+ if(typeof BundledCheers!=='undefined')$('native-audio-check').src=URL.createObjectURL(BundledCheers.blob('correct',0));
  for(let n=1;n<=9;n++){const b=document.createElement('button');b.dataset.level=n;b.textContent=n;b.setAttribute('aria-label',`${n}のだん`);b.addEventListener('click',()=>selectLevel(n));$('levels').append(b);}
  document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>selectMode(b.dataset.mode)));$('extra-ten').addEventListener('click',()=>selectLevel(10));$('recommended').addEventListener('click',()=>selectLevel('recommended'));
  $('sound-toggle').addEventListener('click',()=>{Voice.unlock();const on=!(state.settings.voiceOn&&state.settings.goalSoundOn);state.settings.voiceOn=on;state.settings.goalSoundOn=on;state.settings.soundSetupV8=true;if(on){if(state.settings.studyVolume===0)state.settings.studyVolume=.65;if(state.settings.goalVolume===0)state.settings.goalVolume=.65;}Voice.stop();updateHome();persist();if(on)Voice.play('sound-check','ににんがし。','study');});
@@ -222,7 +222,7 @@ async function boot(){
  $('retry').addEventListener('click',()=>{flow++;Voice.stop();$('stadium').classList.remove('saving');$('save-banner').hidden=true;setText('feedback','ゆっくり えらんでね。');setText('reading',current.prompt+'…？');});$('hint').addEventListener('click',()=>{Voice.unlock();hint();});$('listen-help').addEventListener('click',()=>openListen([current]));
  $('again').addEventListener('click',()=>{Voice.unlock();beginGame(isReview?(duePool().length?duePool():roundPool):roundPool,isReview);});
  $('open-parent').addEventListener('click',()=>{go('parents');loadSettingsForm();});$('settings-form').addEventListener('submit',saveSettings);$('settings-form').addEventListener('input',scheduleSettingsSave);$('settings-form').addEventListener('change',()=>saveSettings());
- $('test-goal').addEventListener('click',async()=>{Voice.unlock();if(!(await saveSettings()))return;setText('settings-status','ゴール音声と歓声を再生しています…');const playback=Voice.goal();await Voice.crowd();const ok=await playback;setText('settings-status',ok?'再生を終了しました。聞こえない場合はゴール音声のONと端末の音量を確認してください。':'再生できませんでした。画面下の音声メッセージを確認してください。');});
+ $('test-goal').addEventListener('click',async()=>{Voice.unlock();if(!(await saveSettings()))return;setText('settings-status','正解音声と歓声を再生しています…');const playback=Voice.goal();await Voice.crowd();const ok=await playback;setText('settings-status',ok?'再生を終了しました。聞こえない場合はゴール音声のONと端末の音量を確認してください。':'再生できませんでした。画面下の音声メッセージを確認してください。');});
  $('test-bgm').addEventListener('click',async()=>{if(!(await saveSettings())||typeof BGM==='undefined')return;BGM.preview();setText('settings-status','BGMをためしています。音量を動かして聞き比べられます。');});
  $('stop-bgm').addEventListener('click',()=>{if(typeof BGM!=='undefined'){BGM.screen(screen);BGM.pause();}setText('settings-status','BGMをとめました。');});
  $('test-save').addEventListener('click',async()=>{Voice.unlock();if(!(await saveSettings()))return;setText('settings-status','GKセーブの音声を再生しています…');const ok=await Voice.save();setText('settings-status',ok?'再生を終了しました。':'再生できませんでした。ゲームの音声ONと音量を確認してください。');});
