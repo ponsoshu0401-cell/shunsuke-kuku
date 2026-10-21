@@ -46,16 +46,16 @@ async function playAll(){
 function stopAll(){flow++;continuous=false;Voice.stop();highlight(null);setText('play-all','ここから きく');}
 function beginGame(pool,review=false){
  if(!pool.length){go('home');return;}roundPool=[...pool];isReview=review;
- roundScore={goals:0,shots:0,saves:0};updateScore();queue=chooseQuestions(pool,state.settings.count,state.history);position=0;go('game');renderQuestion();
+ roundScore={goals:0,shots:0,saves:0};updateScore();queue=chooseQuestions(pool,state.settings.count,state.history);position=0;go('game');renderQuestion(true);
 }
-function renderQuestion(){
+function renderQuestion(opening=false){
  flow++;Voice.stop();const ticket=flow;current=queue[position];phase='question';hadWrong=false;hintUsed=false;
  $('stadium').classList.remove('shooting','saving');$('goal-banner').hidden=true;$('save-banner').hidden=true;$('repeat').disabled=false;$('confetti').replaceChildren();
  setText('game-mode',mode==='speak'?'つづきを いおう':isReview?'ふくしゅう':'くくシュート！');setText('counter',`${position+1} / ${queue.length}`);
  setText('question-guide',mode==='speak'?'こえに だして いってみよう':'つづきは なあに？');setText('equation',`${current.a} × ${current.b} = ？`);setText('reading',current.prompt+'…？');setText('feedback','');
  $('answers').hidden=mode==='speak';$('reveal').hidden=mode!=='speak';$('reveal').disabled=false;$('next').hidden=true;$('retry-tools').hidden=true;$('listen-help').hidden=true;
  renderChoices();if(typeof ShotMotion!=='undefined')ShotMotion.prepare();
- (async()=>{await Voice.cheer('question');if(ticket!==flow)return;await Voice.chant(current,true);})();
+ (async()=>{if(opening){await Voice.cheer('start');if(ticket!==flow)return;}await Voice.cheer('question');if(ticket!==flow)return;await Voice.chant(current,true);})();
 }
 function renderChoices(){
  const answer=current.value,values=new Set([answer]);const candidates=[answer-current.a,answer+current.a,answer+2*current.a,answer-1,answer+1].filter(n=>n>0&&n!==answer);
@@ -83,9 +83,10 @@ async function answerQuestion(value,button){
  $('retry-tools').hidden=true;$('listen-help').hidden=true;$('save-banner').hidden=true;setText('equation',q.a+' × '+q.b+' = '+q.value);setText('reading',q.full);setText('feedback','せいかい！ シュート！');
  $('stadium').classList.remove('saving','shooting');void $('stadium').offsetWidth;$('stadium').classList.add('shooting');
  try{
+  const encouragement=(async()=>{await Voice.cheer('correct');if(ticket!==flow)return false;await Voice.cheer('shoot');return ticket===flow;})();
   await wait(850);if(ticket!==flow)return;$('goal-banner').hidden=false;makeConfetti();showNext();
-  const goalPlayback=Voice.goal();await Voice.crowd();await goalPlayback;if(ticket!==flow)return;
-  await Voice.praise();if(ticket!==flow)return;await Voice.chant(q);
+  if(!(await encouragement)||ticket!==flow)return;const goalPlayback=Voice.goal();await Voice.crowd();await goalPlayback;if(ticket!==flow)return;
+  await Voice.chant(q);
  }finally{if(ticket===flow)showNext();}
 }
 
@@ -195,6 +196,7 @@ function safeState(saved){
  if(typeof s.voiceURI==='string')result.settings.voiceURI=s.voiceURI;
  if(!s.gentleVoice){result.settings.voiceOn=false;result.settings.cheerVolume=0;result.settings.studyVolume=.65;}
  if(!s.soundSetupV8){result.settings.voiceOn=true;result.settings.goalSoundOn=true;if(result.settings.studyVolume===0)result.settings.studyVolume=.65;if(result.settings.goalVolume===0)result.settings.goalVolume=.65;}
+ if(!s.misaCheersV1&&result.settings.cheerVolume===0)result.settings.cheerVolume=.65;
  for(const k of Object.keys(EVENT_LABELS))if(Array.isArray(s.cheers?.[k]))result.settings.cheers[k]=s.cheers[k].filter(v=>typeof v==='string').slice(0,8).map(v=>v.slice(0,300));
  for(const q of QUESTIONS){const h=saved.history?.[q.id];if(h&&['correct','wrong','streak','wrongStreak'].every(k=>Number.isSafeInteger(h[k])&&h[k]>=0))result.history[q.id]={...h,due:Boolean(h.due)};}
  if(Array.isArray(saved.events))result.events=saved.events.filter(e=>QUESTIONS.some(q=>q.id===e.id)&&typeof e.correct==='boolean').slice(-500);
@@ -203,10 +205,11 @@ function safeState(saved){
 async function boot(){
  $('start').disabled=true;
  await Store.open();state=safeState(await Store.get('state'));Voice.setup(state.settings);
+ if(typeof BundledCheers!=='undefined')$('native-audio-check').src=URL.createObjectURL(BundledCheers.blob('goal'));
  for(let n=1;n<=9;n++){const b=document.createElement('button');b.dataset.level=n;b.textContent=n;b.setAttribute('aria-label',`${n}のだん`);b.addEventListener('click',()=>selectLevel(n));$('levels').append(b);}
  document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>selectMode(b.dataset.mode)));$('extra-ten').addEventListener('click',()=>selectLevel(10));$('recommended').addEventListener('click',()=>selectLevel('recommended'));
  $('sound-toggle').addEventListener('click',()=>{Voice.unlock();const on=!(state.settings.voiceOn&&state.settings.goalSoundOn);state.settings.voiceOn=on;state.settings.goalSoundOn=on;state.settings.soundSetupV8=true;if(on){if(state.settings.studyVolume===0)state.settings.studyVolume=.65;if(state.settings.goalVolume===0)state.settings.goalVolume=.65;}Voice.stop();updateHome();persist();if(on)Voice.play('sound-check','ににんがし。','study');});
- $('start').addEventListener('click',()=>{Voice.unlock();if(mode==='listen'){openListen(poolForSelection());Voice.cheer('start');}else{beginGame(poolForSelection());const ticket=++flow;Voice.stop();(async()=>{await Voice.cheer('start');if(ticket!==flow)return;await Voice.chant(current,true);})();}});
+ $('start').addEventListener('click',()=>{Voice.unlock();if(mode==='listen'){openListen(poolForSelection());Voice.cheer('start');}else{beginGame(poolForSelection());}});
  $('review').addEventListener('click',()=>{selectMode('quiz');Voice.unlock();beginGame(duePool(),true);});
  $('play-all').addEventListener('click',()=>{Voice.unlock();playAll();});$('stop-all').addEventListener('click',stopAll);
  $('learn-speed').addEventListener('change',()=>{stopAll();state.settings.speed=Number($('learn-speed').value);Voice.setup(state.settings);persist();});
@@ -218,7 +221,7 @@ async function boot(){
  $('retry').addEventListener('click',()=>{flow++;Voice.stop();$('stadium').classList.remove('saving');$('save-banner').hidden=true;setText('feedback','ゆっくり えらんでね。');setText('reading',current.prompt+'…？');});$('hint').addEventListener('click',()=>{Voice.unlock();hint();});$('listen-help').addEventListener('click',()=>openListen([current]));
  $('again').addEventListener('click',()=>{Voice.unlock();beginGame(isReview?(duePool().length?duePool():roundPool):roundPool,isReview);});
  $('open-parent').addEventListener('click',()=>{go('parents');loadSettingsForm();});$('settings-form').addEventListener('submit',saveSettings);$('settings-form').addEventListener('input',scheduleSettingsSave);$('settings-form').addEventListener('change',()=>saveSettings());
- $('test-goal').addEventListener('click',async()=>{Voice.unlock();if(!(await saveSettings()))return;setText('settings-status','ゴール音声と歓声を再生しています…');const playback=Voice.goal();await Voice.crowd();const ok=await playback;if(ok)await Voice.praise();setText('settings-status',ok?'再生を終了しました。聞こえない場合はゴール音声のONと端末の音量を確認してください。':'再生できませんでした。画面下の音声メッセージを確認してください。');});
+ $('test-goal').addEventListener('click',async()=>{Voice.unlock();if(!(await saveSettings()))return;setText('settings-status','ゴール音声と歓声を再生しています…');const playback=Voice.goal();await Voice.crowd();const ok=await playback;setText('settings-status',ok?'再生を終了しました。聞こえない場合はゴール音声のONと端末の音量を確認してください。':'再生できませんでした。画面下の音声メッセージを確認してください。');});
  $('test-bgm').addEventListener('click',async()=>{if(!(await saveSettings())||typeof BGM==='undefined')return;BGM.preview();setText('settings-status','BGMをためしています。音量を動かして聞き比べられます。');});
  $('stop-bgm').addEventListener('click',()=>{if(typeof BGM!=='undefined'){BGM.screen(screen);BGM.pause();}setText('settings-status','BGMをとめました。');});
  $('test-save').addEventListener('click',async()=>{Voice.unlock();if(!(await saveSettings()))return;setText('settings-status','GKセーブの音声を再生しています…');const ok=await Voice.save();setText('settings-status',ok?'再生を終了しました。':'再生できませんでした。ゲームの音声ONと音量を確認してください。');});
