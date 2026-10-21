@@ -30,7 +30,7 @@ const Voice = (()=>{
   const volume=kind==='goal'?(config.goalVolume??.65):kind==='study'?config.studyVolume:config.cheerVolume;
   if((kind==='goal'?!config.goalSoundOn:!config.voiceOn)||volume===0)return true;
   let blob=await Store.get('audio:'+key);
-  if(!blob&&key==='bundle:goal'){try{const response=await fetch('./audio/goal.mp3');if(!response.ok)throw Error('goal audio');blob=await response.blob();}catch{notice('ゴールの こえを ひらけません。アプリの ファイルを たしかめてね。');return false;}}
+  if(!blob&&['bundle:goal-hugo','bundle:praise-ellis','bundle:save-emma'].includes(key)){try{blob=key==='bundle:praise-ellis'?BundledAudio.praiseBlob():key==='bundle:save-emma'?BundledAudio.saveBlob():BundledAudio.goalBlob();}catch{notice('ゴールの こえを ひらけません。bundled-audio.jsも いっしょに おいてね。');return false;}}
   if(token!==serial)return false;
   if(blob){
    try{
@@ -53,11 +53,17 @@ const Voice = (()=>{
  }
  async function chant(q,prompt=false){return play((prompt?'prompt:':'chant:')+q.id,prompt?q.prompt+'？':q.full,'study');}
  function cheerText(text){return text.replace(/\{(name|nick|keeper)\}/g,(_,key)=>config[key]);}
- async function goal(){return play('bundle:goal','','goal');}
+ async function goal(){return play('bundle:goal-hugo','','goal');}
+ async function praise(){return play('bundle:praise-ellis','','goal');}
+ async function save(){return play('bundle:save-emma','','goal');}
  async function cheer(event){const lines=config.cheers[event]||[];if(!lines.length)return true;const i=Math.floor(Math.random()*lines.length);return play('cheer:'+event+':'+i,cheerText(lines[i]),'cheer');}
- function crowd(){
-  if(!config.voiceOn||!config.cheerVolume)return;
-  try{unlock();if(!context)return;const buffer=context.createBuffer(1,context.sampleRate*0.9,context.sampleRate);const data=buffer.getChannelData(0);for(let i=0;i<data.length;i++)data[i]=(Math.random()*2-1)*Math.pow(1-i/data.length,1.5)*0.15;const s=context.createBufferSource();s.buffer=buffer;const filter=context.createBiquadFilter();filter.type='bandpass';filter.frequency.value=1200;const g=context.createGain();g.gain.value=config.cheerVolume;s.connect(filter).connect(g).connect(context.destination);effects.add(s);s.onended=()=>effects.delete(s);s.start();}catch{}
+ async function crowd(){
+  if(!config.goalSoundOn||!(config.crowdVolume>0))return false;
+  const token=serial;
+  try{unlock();if(!context)return false;const buffer=await context.decodeAudioData(await BundledAudio.crowdBlob().arrayBuffer());if(token!==serial)return false;
+   const effect=context.createBufferSource();effect.buffer=buffer;const volume=context.createGain();volume.gain.value=config.crowdVolume;effect.connect(volume).connect(context.destination);effects.add(effect);effect.onended=()=>effects.delete(effect);effect.start();return true;
+  }catch{notice('かんせいを さいせいできませんでした。');return false;}
  }
- return {setup,unlock,stop,play,chant,cheer,cheerText,crowd,localVoice,listVoices,goal};
+
+ return {setup,unlock,stop,play,chant,cheer,cheerText,crowd,localVoice,listVoices,goal,praise,save};
 })();

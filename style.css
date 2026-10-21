@@ -44,3 +44,14 @@ footer{background:#fff9e9ed;margin-top:24px;padding:14px 12px;border-radius:22px
 @keyframes shoot{to{left:72%;top:118px;transform:scale(.45) rotate(500deg)}}
 @keyframes dive{to{transform:translateX(-46px) rotate(-25deg) scale(.88)}}
 @media(max-width:370px){.hero{padding:22px 8px 14px;min-height:430px}.hero h1 strong{font-size:33px}.mini-avatar{width:104px}.mini-avatar img{width:88px;height:88px}.home-kit{width:82px;height:65px;font-size:33px;line-height:61px}.mini-team{gap:6px}.hero-ball{font-size:33px}.stadium{height:405px}.striker{top:183px}.player{width:128px}.striker{left:calc(25% - 64px)}.keeper{left:calc(65% - 64px)}.shot-ball{top:323px}.player img{width:86px;height:86px}.player .shirt{width:86px;height:72px;line-height:66px}.net{left:10%;width:80%}.goal-banner{font-size:28px}}
+/* v7：スコアとGKセーブ */
+.scoreboard{display:grid;grid-template-columns:1fr 1fr 1.2fr;gap:5px;background:#122e4d;color:#fff5bd;border:3px solid #ebd580;border-radius:18px;padding:10px 7px;margin:0 0 15px;box-shadow:0 4px 0 #0a253c;text-align:center}
+.scoreboard>div{border-right:1px solid #ffffff3d;min-width:0}.scoreboard>div:last-child{border:0}.scoreboard span{display:block;font-size:12px;font-weight:800;overflow-wrap:anywhere}.scoreboard b{display:block;font-size:32px;line-height:1.2;font-variant-numeric:tabular-nums;color:#fff}
+.save-banner{position:absolute;inset:48px 10px auto;background:#f1fbffed;color:#194d77;border:3px solid #90c6e4;border-radius:16px;padding:12px;text-align:center;font-size:27px;font-weight:900;z-index:5;box-shadow:0 5px 15px #0e2b3240}.save-banner span{display:block;font-size:16px;margin-top:4px;color:#426d80}
+.saving .shot-ball{animation:save-ball .8s cubic-bezier(.2,.7,.5,1) forwards}.saving .striker{animation:kick .5s ease}.saving .keeper{animation:keeper-catch .8s ease forwards;z-index:4}
+.saving .keeper::before,.saving .keeper::after{content:'';position:absolute;width:25px;height:30px;top:100px;background:#ffedb0;border:3px solid white;border-radius:45%;box-shadow:0 2px 0 #14344b}
+.saving .keeper::before{left:23px;transform:rotate(-25deg)}.saving .keeper::after{right:23px;transform:rotate(25deg)}
+@keyframes save-ball{80%{left:61%;top:153px;transform:scale(.55) rotate(330deg)}100%{left:61%;top:155px;transform:scale(.5) rotate(340deg)}}
+@keyframes keeper-catch{50%{transform:translateX(-3px) translateY(-9px) scale(.94)}100%{transform:translateX(-3px) scale(.94)}}
+@media(max-width:370px){.scoreboard span{font-size:11px}.scoreboard b{font-size:28px}.save-banner{font-size:23px}}
+@media(prefers-reduced-motion:reduce){.saving .shot-ball{animation-duration:.01ms}.saving .keeper{animation-duration:.01ms}}
