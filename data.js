@@ -21,7 +21,7 @@ const QUESTIONS = CHANT_ROWS.flatMap((row,a)=>row.map((s,b)=>{
  const [prompt,answer]=s.split('|');return {id:`${a+1}-${b+1}`,a:a+1,b:b+1,value:(a+1)*(b+1),prompt,answer,full:prompt+answer};
 })).concat(EXTRA_TEN.map(([p,answer],b)=>{const prompt=p.replace('|','');return {id:`10-${b+1}`,a:10,b:b+1,value:10*(b+1),prompt,answer,full:prompt+answer,extra:true};}));
 const DEFAULT_SETTINGS = {
- name:'しゅうすけ',nick:'しゅう',number:'29',keeper:'そうた',count:3,speed:1,voiceOn:false,studyVolume:0.65,cheerVolume:0,voiceURI:'',gentleVoice:true,fluentVoiceV1:true,goalSoundOn:true,goalVolume:0.65,crowdVolume:0.4,goalHugoV1:true,
+ name:'しゅうすけ',nick:'しゅう',number:'29',keeper:'そうた',count:3,speed:1,voiceOn:true,studyVolume:0.65,cheerVolume:0,voiceURI:'',gentleVoice:true,fluentVoiceV1:true,goalSoundOn:true,goalVolume:0.65,crowdVolume:0.4,goalHugoV1:true,soundSetupV8:true,
  cheers:{
   start:['{name}の、くくシュート！ はじまるよ！','{nick}くん、いっしょに やってみよう！'],
   question:['{nick}くん、これわかるかな？','ゆっくりで いいよ！'],

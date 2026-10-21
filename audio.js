@@ -6,8 +6,9 @@ const Voice = (()=>{
  const synth=window.speechSynthesis;
  function setup(settings){config=settings;}
  function unlock(){
-  try{context ||= new (window.AudioContext||window.webkitAudioContext)();if(context.state==='suspended')context.resume().catch(()=>{});}catch{}
-  synth?.getVoices();
+  try{if(typeof navigator!=='undefined'&&navigator.audioSession)navigator.audioSession.type='playback';}catch{}
+  try{if(context?.state==='closed')context=null;context ||= new (window.AudioContext||window.webkitAudioContext)();if(context.state==='suspended'||context.state==='interrupted')context.resume().catch(()=>{});}catch{}
+  try{synth?.getVoices();}catch{}
  }
  function stop(){serial++;for(const effect of effects){try{effect.stop();}catch{}}effects.clear();if(source){try{source.stop();}catch{}source=null;}if(synth)synth.cancel();if(finish){finish(false);finish=null;}utterance=null;}
  function listVoices(){return synth?synth.getVoices().filter(v=>v.lang.startsWith('ja')&&v.localService):[];}
@@ -24,7 +25,7 @@ const Voice = (()=>{
   await new Promise(resolve=>{const done=()=>{clearTimeout(timer);synth.removeEventListener('voiceschanged',done);resolve();};const timer=setTimeout(done,1000);synth.addEventListener('voiceschanged',done);});
   return selectedVoice();
  }
- function notice(text){document.getElementById('voice-status').textContent=text;}
+ function notice(text){for(const id of ['voice-status','game-voice-status']){const el=document.getElementById(id);if(el)el.textContent=text;}}
  async function play(key,text,kind='study'){
   stop();const token=serial;
   const volume=kind==='goal'?(config.goalVolume??.65):kind==='study'?config.studyVolume:config.cheerVolume;
@@ -36,7 +37,7 @@ const Voice = (()=>{
    try{
     unlock();if(!context)throw Error('AudioContext');
     const buffer=await context.decodeAudioData(await blob.arrayBuffer());if(token!==serial)return false;
-    if(context.state!=='running')await context.resume();
+    if(context.state!=='running'){await Promise.race([context.resume(),new Promise((_,reject)=>setTimeout(()=>reject(Error('audio gesture needed')),2500))]);if(context.state!=='running')throw Error('audio suspended');}
     source=context.createBufferSource();source.buffer=buffer;source.playbackRate.value=kind==='goal'?1:config.speed;
     gain=context.createGain();gain.gain.value=volume;source.connect(gain).connect(context.destination);
     return await new Promise(resolve=>{finish=resolve;source.onended=()=>{if(token===serial){finish=null;source=null;resolve(true);}};source.start();});

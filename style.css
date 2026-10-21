@@ -55,3 +55,56 @@ footer{background:#fff9e9ed;margin-top:24px;padding:14px 12px;border-radius:22px
 @keyframes keeper-catch{50%{transform:translateX(-3px) translateY(-9px) scale(.94)}100%{transform:translateX(-3px) scale(.94)}}
 @media(max-width:370px){.scoreboard span{font-size:11px}.scoreboard b{font-size:28px}.save-banner{font-size:23px}}
 @media(prefers-reduced-motion:reduce){.saving .shot-ball{animation-duration:.01ms}.saving .keeper{animation-duration:.01ms}}
+/* v8：スマホの回答中も演出を見せるコンパクト画面 */
+.app-header{display:grid;grid-template-columns:1fr auto;gap:5px 8px}
+.app-header #brand{grid-column:1;grid-row:1}.app-header #open-parent{grid-column:2;grid-row:1}
+.sound-toggle{grid-column:1/-1;grid-row:2;min-height:42px;padding:6px 12px;font-size:15px;border:2px solid #d5e8dc;background:#fff7dc;color:#244a3d;box-shadow:0 3px 0 #153a3344}
+.sound-toggle[aria-pressed=false]{background:#ffe9d2;border-color:#f1ba79}
+audio#native-audio-check{width:100%;min-height:44px;margin:8px 0}.game-voice-status{font-size:12px;line-height:1.4;color:#805221;margin:0}.game-voice-status:empty{display:none}
+body.game-active main{padding-top:max(5px,env(safe-area-inset-top));padding-bottom:max(6px,env(safe-area-inset-bottom))}
+body.game-active .app-header{grid-template-columns:36px 1fr auto;gap:4px;padding:0 2px 5px;align-items:center}
+body.game-active .app-header #brand{min-height:34px;grid-column:1;grid-row:1;font-size:22px}body.game-active .app-header #brand span{display:none}
+body.game-active .app-header #open-parent{grid-column:3;grid-row:1;min-height:34px;padding:4px 8px;font-size:12px}
+body.game-active .sound-toggle{grid-column:2;grid-row:1;min-height:34px;padding:3px 8px;font-size:14px;box-shadow:none}
+body.game-active footer{display:none}
+#game .section-title{min-height:32px;margin:0 0 5px;padding:0 5px;box-shadow:none}
+#game .section-title .compact{min-height:30px;padding:2px 8px;font-size:13px}#game .section-title>span{font-size:12px}#game .counter{padding:3px 9px}
+#game .scoreboard{margin:0 0 6px;padding:4px;border-width:2px;border-radius:12px;box-shadow:0 2px 0 #0a253c}
+#game .scoreboard span{font-size:10px;line-height:1.2}#game .scoreboard b{font-size:23px;line-height:1.1}
+#game .stadium{height:175px;height:clamp(130px,25dvh,190px);border-width:3px;border-radius:18px;position:sticky;top:max(3px,env(safe-area-inset-top));z-index:3;box-shadow:0 3px 0 #102e3380}
+#game .stands{height:24px;top:3px;left:24%;right:24%;border-width:2px;border-radius:8px}#game .stands::after{font-size:12px;line-height:20px;letter-spacing:.05em}
+#game .net{top:10%;height:48%;left:33%;width:58%;border-width:3px;background-size:auto}
+#game .player{width:88px}#game .player img{width:54px;height:54px;border-width:2px}
+#game .player .shirt{width:60px;height:46px;line-height:41px;font-size:26px;margin-top:-8px;background-size:20px auto}
+#game .striker .shirt{background:repeating-linear-gradient(90deg,#85d0f3 0 10px,#fff 10px 20px)}#game .keeper .shirt{background:#172d53;font-size:20px}
+#game .player .legs{width:36px;height:14px;border-left-width:12px;border-right-width:12px;filter:drop-shadow(0 3px 0 #203e48)}
+#game .player-name{font-size:10px;line-height:1.2;border-width:1px;padding:1px 5px;max-width:88px}
+#game .striker{--actor-scale:.94;left:calc(26% - 44px);top:22%;transform:scale(var(--actor-scale));transform-origin:center top}
+#game .keeper{--keeper-scale:.78;left:calc(70% - 44px);top:7%;transform:scale(var(--keeper-scale));transform-origin:center top}
+#game .shot-ball{left:46%;top:74%;font-size:29px}
+#game .pitch-circle{bottom:-35px;height:100px}
+#game .goal-banner,#game .save-banner{inset:18px 8px auto;padding:6px 8px;font-size:23px;box-shadow:0 3px 8px #0e2b3240}
+#game .goal-banner span{font-size:14px;letter-spacing:8px}#game .save-banner span{font-size:12px;margin-top:0}
+#game .saving .keeper::before,#game .saving .keeper::after{top:58px;width:16px;height:19px;border-width:2px}#game .saving .keeper::before{left:22px}#game .saving .keeper::after{right:22px}
+#game .shooting .shot-ball{animation-name:shootCompact}#game .saving .shot-ball{animation-name:saveCompact}
+#game .shooting .keeper{animation-name:diveCompact}#game .saving .keeper{animation-name:catchCompact}
+#game .shooting .striker,#game .saving .striker{animation-name:kickCompact}
+#game .question-panel{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 8px;align-items:center;margin:8px 0 0;padding:8px 12px;border-radius:18px;box-shadow:0 3px 0 #153d3045}
+#game #question-guide{display:none}
+#game .equation{grid-column:1;grid-row:1;font-size:31px;line-height:1.2;letter-spacing:.025em;margin:0;white-space:nowrap}
+#game #repeat{grid-column:2;grid-row:1;min-height:36px;padding:5px 12px;font-size:14px;border-radius:12px}
+#game .reading{grid-column:1/-1;margin:0;font-size:19px;line-height:1.3}
+#game .feedback{grid-column:1/-1;font-size:14px;line-height:1.35;min-height:19px;margin:0}
+#game .answers{grid-column:1/-1;gap:10px;margin:2px 0 4px}
+#game .answers button{min-height:64px;padding:6px 4px;font-size:30px;border-radius:14px;box-shadow:0 3px 0 #0c4531}
+#game #next,#game #reveal{grid-column:1/-1;min-height:44px;margin:3px 0 2px;padding:6px 12px;font-size:18px;border-radius:13px;box-shadow:0 3px 0 #b47b29}
+#game #retry-tools{grid-column:1/-1;margin:3px 0 0;gap:8px}#game #retry-tools button{min-height:42px;padding:5px 8px;font-size:15px}
+#game #listen-help{grid-column:1/-1;min-height:40px;padding:5px 10px;font-size:14px}
+#game .game-voice-status{grid-column:1/-1}
+@keyframes shootCompact{to{left:75%;top:22%;transform:scale(.45) rotate(500deg)}}
+@keyframes saveCompact{to{left:67%;top:34%;transform:scale(.5) rotate(340deg)}}
+@keyframes kickCompact{50%{transform:rotate(-15deg) scale(var(--actor-scale,.94))}}
+@keyframes diveCompact{to{transform:translateX(-28px) rotate(-25deg) scale(var(--keeper-scale,.78))}}
+@keyframes catchCompact{50%{transform:translateY(-6px) scale(var(--keeper-scale,.78))}to{transform:scale(var(--keeper-scale,.78))}}
+@media(max-height:620px){#game .striker{--actor-scale:.76}#game .keeper{--keeper-scale:.65}#game .stadium{height:130px;height:clamp(120px,25dvh,150px)}#game .question-panel{gap:3px 6px;padding:6px 10px}#game .equation{font-size:28px}#game .reading{font-size:17px}#game .answers button{min-height:60px}#game .scoreboard b{font-size:21px}}
+@media(max-width:350px){#game .equation{font-size:27px}#game .reading{font-size:17px}#game #repeat{padding:5px 9px}.app-header a{font-size:15px}#game .section-title #game-mode{font-size:11px}}

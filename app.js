@@ -6,7 +6,7 @@ const photoURLs={};let recording=null,recordStarting=false;
 const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 async function persist(){return Store.put('state',state);}
 function setText(id,text){$(id).textContent=text;}
-function go(name){flow++;continuous=false;Voice.stop();if(recording||recordStarting)cancelRecording();screen=name;document.querySelectorAll('.screen').forEach(el=>el.hidden=el.id!==name);window.scrollTo({top:0,behavior:'instant'});}
+function go(name){$('native-audio-check')?.pause?.();flow++;continuous=false;Voice.stop();if(recording||recordStarting)cancelRecording();screen=name;document.body?.classList.toggle('game-active',name==='game');document.querySelectorAll('.screen').forEach(el=>el.hidden=el.id!==name);window.scrollTo({top:0,behavior:'instant'});}
 function poolForSelection(){return QUESTIONS.filter(q=>selected==='recommended'?[2,5,10].includes(q.a):q.a===selected);}
 function selectionLabel(){return selected==='recommended'?'おすすめ 2・5・10':`${selected}の だん`;}
 function duePool(){return QUESTIONS.filter(q=>state.history[q.id]?.due);}
@@ -16,6 +16,7 @@ function updateHome(){
  setText('home-stats',`ゴール ${state.practice.goals}かい ／ ${state.practice.shots}シュート ・ きいた くく ${state.practice.listened}かい`);
  setText('hero-name',state.settings.name);setText('shirt-number',state.settings.number);setText('home-shirt-number',state.settings.number);
  document.querySelectorAll('[data-name]').forEach(el=>el.textContent=state.settings[el.dataset.name]);
+ const soundOn=state.settings.voiceOn&&state.settings.goalSoundOn;setText('sound-toggle',soundOn?'🔊 おと ON':'🔇 おとをつける');$('sound-toggle').setAttribute('aria-pressed',String(soundOn));
  $('goal-voice-on').checked=state.settings.goalSoundOn;$('voice-on').checked=state.settings.voiceOn;Voice.setup(state.settings);
 }
 function selectLevel(level){selected=level;document.querySelectorAll('[data-level]').forEach(button=>{const yes=Number(button.dataset.level)===level;button.classList.toggle('selected',yes);button.setAttribute('aria-pressed',String(yes));});$('recommended').classList.toggle('selected',level==='recommended');$('recommended').setAttribute('aria-pressed',String(level==='recommended'));setText('selection-note',level===10?'10の だんは「じゅう かける…」で よむよ。':selectionLabel());}
@@ -191,6 +192,7 @@ function safeState(saved){
  if(!s.goalHugoV1){result.settings.goalSoundOn=true;if(result.settings.goalVolume===0)result.settings.goalVolume=.65;result.settings.crowdVolume=.4;}
  if(typeof s.voiceURI==='string')result.settings.voiceURI=s.voiceURI;
  if(!s.gentleVoice){result.settings.voiceOn=false;result.settings.cheerVolume=0;result.settings.studyVolume=.65;}
+ if(!s.soundSetupV8){result.settings.voiceOn=true;result.settings.goalSoundOn=true;if(result.settings.studyVolume===0)result.settings.studyVolume=.65;if(result.settings.goalVolume===0)result.settings.goalVolume=.65;}
  for(const k of Object.keys(EVENT_LABELS))if(Array.isArray(s.cheers?.[k]))result.settings.cheers[k]=s.cheers[k].filter(v=>typeof v==='string').slice(0,8).map(v=>v.slice(0,300));
  for(const q of QUESTIONS){const h=saved.history?.[q.id];if(h&&['correct','wrong','streak','wrongStreak'].every(k=>Number.isSafeInteger(h[k])&&h[k]>=0))result.history[q.id]={...h,due:Boolean(h.due)};}
  if(Array.isArray(saved.events))result.events=saved.events.filter(e=>QUESTIONS.some(q=>q.id===e.id)&&typeof e.correct==='boolean').slice(-500);
@@ -201,6 +203,7 @@ async function boot(){
  await Store.open();state=safeState(await Store.get('state'));Voice.setup(state.settings);
  for(let n=1;n<=9;n++){const b=document.createElement('button');b.dataset.level=n;b.textContent=n;b.setAttribute('aria-label',`${n}のだん`);b.addEventListener('click',()=>selectLevel(n));$('levels').append(b);}
  document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>selectMode(b.dataset.mode)));$('extra-ten').addEventListener('click',()=>selectLevel(10));$('recommended').addEventListener('click',()=>selectLevel('recommended'));
+ $('sound-toggle').addEventListener('click',()=>{Voice.unlock();const on=!(state.settings.voiceOn&&state.settings.goalSoundOn);state.settings.voiceOn=on;state.settings.goalSoundOn=on;state.settings.soundSetupV8=true;if(on){if(state.settings.studyVolume===0)state.settings.studyVolume=.65;if(state.settings.goalVolume===0)state.settings.goalVolume=.65;}Voice.stop();updateHome();persist();if(on)Voice.play('sound-check','ににんがし。','study');});
  $('start').addEventListener('click',()=>{Voice.unlock();if(mode==='listen'){openListen(poolForSelection());Voice.cheer('start');}else{beginGame(poolForSelection());const ticket=++flow;Voice.stop();(async()=>{await Voice.cheer('start');if(ticket!==flow)return;await Voice.chant(current,true);})();}});
  $('review').addEventListener('click',()=>{selectMode('quiz');Voice.unlock();beginGame(duePool(),true);});
  $('play-all').addEventListener('click',()=>{Voice.unlock();playAll();});$('stop-all').addEventListener('click',stopAll);
