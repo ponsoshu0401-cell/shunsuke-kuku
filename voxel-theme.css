@@ -1,4 +1,4 @@
-@font-face{font-family:KukuPixel;src:url('DotGothic16-Regular.ttf') format('truetype');font-style:normal;font-weight:400;font-display:swap}
+@font-face{font-family:KukuPixel;src:url('PixelMplus10-Bold.ttf') format('truetype');font-style:normal;font-weight:400;font-display:swap}
 /* One shared game world: pixel type, textured wood and square paper signs. */
 :root{font-family:KukuPixel,monospace;font-synthesis:weight;--green:#426e26;--dark:#39250f;--lime:#f4df9e;--border:#64512d;color:#35250f;background:#4497eb}
 body{background:#408426 url('voxel-grass.svg') center/96px repeat}
@@ -80,3 +80,23 @@ body.game-active main{background:linear-gradient(#6aa6edaa,#366a24bb),url('voxel
 #finish-message{font-size:19px;color:#35250f}
 @media(max-height:670px){#game .stadium{height:165px}#game .player{width:146px;height:146px}#game .striker{--actor-scale:.91;left:calc(23% - 73px);top:15px}#game .keeper{--keeper-scale:.71;left:calc(77% - 73px);top:10px}#game .question-panel{padding:6px 9px}#game .equation{font-size:31px}#game .reading{font-size:18px}#game .answers button,#game .answers button:nth-child(2),#game .answers button:nth-child(3){min-height:64px;font-size:32px}}
 @media(max-width:350px){#home .mode b{font-size:22px}#home #start{font-size:33px}#home #levels button,#home #extra-ten{font-size:27px}#game .equation{font-size:29px}#game .reading{font-size:18px}#game .scoreboard span{font-size:10px}#game .answers button,#game .answers button:nth-child(2),#game .answers button:nth-child(3){font-size:31px}#game #repeat{padding-left:10px;padding-right:10px;font-size:14px}}
+
+/* v18: real bold pixel outlines across all screens; freestanding timber signs. */
+body,button,input,textarea,select,h1,h2,h3,b,strong,label,summary{font-synthesis:none}
+button,.file-button,h2,h3,.chant-row b,#home .voxel-title,#home .mode b,#home #start,#home .voxel-menu h2,#home #levels button,#home #extra-ten,#home .voxel-number,#game .scoreboard b,#game .player .shirt,#game .equation,#game .answers button,#game .goal-banner,#game .save-banner,#finish h1{text-shadow:none;font-weight:400}
+#home .voxel-title{font-size:28px;text-shadow:0 3px #27639b;letter-spacing:.04em}
+#home .mode b{font-size:clamp(22px,6vw,30px)}
+#home #start{font-size:42px;letter-spacing:.04em}
+#home .voxel-menu h2{font-size:22px;text-shadow:0 2px #355526}
+#home #levels button,#home #extra-ten{font-size:32px}
+#game .equation{font-size:36px;letter-spacing:.02em}
+#game .reading{font-size:22px}
+#game .answers button,#game .answers button:nth-child(2),#game .answers button:nth-child(3){font-size:38px}
+#home .voxel-name,#game .field-sign{position:absolute;isolation:isolate;overflow:visible;white-space:nowrap;text-align:center;min-width:64px;max-width:34%;height:34px;padding:5px 9px 8px;background:transparent url('voxel-wood.png') center/100% 145% no-repeat;color:#30200d;border:0;box-shadow:none;text-shadow:none;font-family:KukuPixel,monospace;font-size:17px;font-weight:400;line-height:1.2;transform:none;filter:drop-shadow(2px 3px 1px #24471955);z-index:3}
+#home .voxel-name::after,#game .field-sign::after{content:'';position:absolute;z-index:-1;width:13px;height:24px;left:calc(50% - 6px);top:calc(100% - 4px);background:linear-gradient(90deg,#6c431c 0 22%,#b57d36 22% 62%,#925b25 62% 82%,#583516 82%);border-bottom:3px solid #523916;box-shadow:3px 2px #24471955}
+#home .voxel-name-shu{left:5%;bottom:9%}#home .voxel-name-sota{right:4%;bottom:19%}
+#game .field-sign{min-width:56px;height:29px;font-size:14px;padding:4px 7px 7px;bottom:24px}
+#game .field-sign::after{height:18px;width:10px;left:calc(50% - 5px)}
+#game .field-sign-shu{left:4%}#game .field-sign-sota{right:3%;bottom:39px}
+@media(max-height:670px){#game .field-sign{bottom:19px;height:26px;font-size:12px}#game .field-sign-sota{bottom:30px}#game .equation{font-size:30px}#game .reading{font-size:19px}}
+@media(max-width:350px){#home .voxel-title{font-size:24px}#home #start{font-size:36px}#home .mode b{font-size:22px}#home .voxel-name{min-width:54px;font-size:15px}#game .equation{font-size:28px}#game .answers button,#game .answers button:nth-child(2),#game .answers button:nth-child(3){font-size:32px}}
