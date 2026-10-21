@@ -31,6 +31,8 @@ const Voice = (()=>{
   const volume=kind==='goal'?(config.goalVolume??.65):kind==='study'?config.studyVolume:config.cheerVolume;
   if((kind==='goal'?!config.goalSoundOn:!config.voiceOn)||volume===0)return true;
   let blob=await Store.get('audio:'+key);
+  const clip=!blob&&typeof BundledChants!=='undefined'?BundledChants.clip(key):null;
+  if(clip)blob=clip.blob;
   if(!blob&&['bundle:goal-hugo','bundle:praise-ellis','bundle:save-emma'].includes(key)){try{blob=key==='bundle:praise-ellis'?BundledAudio.praiseBlob():key==='bundle:save-emma'?BundledAudio.saveBlob():BundledAudio.goalBlob();}catch{notice('ゴールの こえを ひらけません。bundled-audio.jsも いっしょに おいてね。');return false;}}
   if(token!==serial)return false;
   if(blob){
@@ -40,7 +42,7 @@ const Voice = (()=>{
     if(context.state!=='running'){await Promise.race([context.resume(),new Promise((_,reject)=>setTimeout(()=>reject(Error('audio gesture needed')),2500))]);if(context.state!=='running')throw Error('audio suspended');}
     source=context.createBufferSource();source.buffer=buffer;source.playbackRate.value=kind==='goal'?1:config.speed;
     gain=context.createGain();gain.gain.value=volume;source.connect(gain).connect(context.destination);
-    return await new Promise(resolve=>{finish=resolve;source.onended=()=>{if(token===serial){finish=null;source=null;resolve(true);}};source.start();});
+    return await new Promise(resolve=>{finish=resolve;source.onended=()=>{if(token===serial){finish=null;source=null;resolve(true);}};if(clip)source.start(0,clip.start,clip.duration);else source.start();});
    }catch{notice('ろくおんを さいせいできません。べつの おんせいを ためしてね。');return false;}
   }
   const voice=await localVoice();if(token!==serial)return false;
