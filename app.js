@@ -219,7 +219,7 @@ async function boot(){
  $('again').addEventListener('click',()=>{Voice.unlock();beginGame(isReview?(duePool().length?duePool():roundPool):roundPool,isReview);});
  $('open-parent').addEventListener('click',()=>{go('parents');loadSettingsForm();});$('settings-form').addEventListener('submit',saveSettings);$('settings-form').addEventListener('input',scheduleSettingsSave);$('settings-form').addEventListener('change',()=>saveSettings());
  $('test-goal').addEventListener('click',async()=>{Voice.unlock();if(!(await saveSettings()))return;setText('settings-status','ゴール音声と歓声を再生しています…');const playback=Voice.goal();await Voice.crowd();const ok=await playback;if(ok)await Voice.praise();setText('settings-status',ok?'再生を終了しました。聞こえない場合はゴール音声のONと端末の音量を確認してください。':'再生できませんでした。画面下の音声メッセージを確認してください。');});
- $('test-bgm').addEventListener('click',async()=>{if(!(await saveSettings())||typeof BGM==='undefined')return;BGM.screen('game');BGM.unlock();setText('settings-status','BGMをためしています。とめるボタンで停止できます。');});
+ $('test-bgm').addEventListener('click',async()=>{if(!(await saveSettings())||typeof BGM==='undefined')return;BGM.preview();setText('settings-status','BGMをためしています。音量を動かして聞き比べられます。');});
  $('stop-bgm').addEventListener('click',()=>{if(typeof BGM!=='undefined'){BGM.screen(screen);BGM.pause();}setText('settings-status','BGMをとめました。');});
  $('test-save').addEventListener('click',async()=>{Voice.unlock();if(!(await saveSettings()))return;setText('settings-status','GKセーブの音声を再生しています…');const ok=await Voice.save();setText('settings-status',ok?'再生を終了しました。':'再生できませんでした。ゲームの音声ONと音量を確認してください。');});
  $('test-voice').addEventListener('click',async()=>{Voice.unlock();Voice.setup({...state.settings,voiceOn:true,voiceURI:$('set-voice').value,speed:Number($('set-speed').value),studyVolume:.6});try{await Voice.play('voice-preview','ににんがし。いっしょに、いってみよう。');}finally{Voice.setup(state.settings);}});
@@ -235,12 +235,15 @@ async function boot(){
  $('record').addEventListener('click',startRecording);$('stop-record').addEventListener('click',()=>{if(recording?.recorder.state==='recording')recording.recorder.stop();});
  $('clear-history').addEventListener('click',async()=>{if(confirm('学習記録をすべて消しますか？写真・録音・設定は残ります。')){const empty=freshState();state.history=empty.history;state.events=[];state.practice=empty.practice;await persist();renderHistory();updateHome();}});
  $('persist-storage').addEventListener('click',async()=>{try{const ok=await navigator.storage?.persist?.();setText('persist-status',ok?'保存のリクエストが許可されました。データ消去に備えて原本も残してください。':'ブラウザーが管理します。永続保存の許可は得られませんでした。');}catch{setText('persist-status','この環境ではリクエストできません。');}});
+ $('bgm-start')?.addEventListener('click',()=>{if(typeof BGM!=='undefined')BGM.unlock();});
+ $('set-bgm-volume').addEventListener('input',()=>{state.settings.bgmVolume=Number($('set-bgm-volume').value);if(typeof BGM!=='undefined')BGM.setup(state.settings);});
  document.addEventListener('pointerdown',()=>Voice.unlock(),{passive:true});
- document.addEventListener('visibilitychange',()=>{if(document.hidden){if(typeof BGM!=='undefined')BGM.pause();flow++;continuous=false;Voice.stop();highlight(null);cancelRecording();if(phase==='solved')showNext();}});
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&typeof BGM!=='undefined')BGM.unlock();if(document.hidden){if(typeof BGM!=='undefined')BGM.pause();flow++;continuous=false;Voice.stop();highlight(null);cancelRecording();if(phase==='solved')showNext();}});
  window.addEventListener('pagehide',()=>{Voice.stop();cancelRecording();});
- await refreshFace('shu');await refreshFace('sota');updateHome();selectLevel(2);selectMode('listen');$('start').disabled=false;
+ await refreshFace('shu');await refreshFace('sota');updateHome();if(typeof BGM!=='undefined')BGM.unlock();selectLevel(2);selectMode('listen');$('start').disabled=false;
  try{const local=await Voice.localVoice();if(!local)setText('voice-status','こえが でないときは、おうちの ひとと おんせいを とうろくしてね。');}
  catch{setText('voice-status','こえを つかえません。がめんで あそべるよ。');}
 }
 boot().catch(error=>{console.error('起動処理のエラー',error);setText('storage-warning','じゅんびが できませんでした。しゅうせいばんの ファイルを ぜんぶ ひらいてね。');$('storage-warning').hidden=false;});
+
 

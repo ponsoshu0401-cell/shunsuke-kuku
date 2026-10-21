@@ -100,3 +100,5 @@ button,.file-button,h2,h3,.chant-row b,#home .voxel-title,#home .mode b,#home #s
 #game .field-sign-shu{left:4%}#game .field-sign-sota{right:3%;bottom:39px}
 @media(max-height:670px){#game .field-sign{bottom:19px;height:26px;font-size:12px}#game .field-sign-sota{bottom:30px}#game .equation{font-size:30px}#game .reading{font-size:19px}}
 @media(max-width:350px){#home .voxel-title{font-size:24px}#home #start{font-size:36px}#home .mode b{font-size:22px}#home .voxel-name{min-width:54px;font-size:15px}#game .equation{font-size:28px}#game .answers button,#game .answers button:nth-child(2),#game .answers button:nth-child(3){font-size:32px}}
+
+#home #bgm-start{display:block;min-height:44px;width:100%;margin:0 0 8px;font-size:14px}#home #bgm-start[hidden]{display:none!important}
