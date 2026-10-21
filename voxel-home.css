@@ -46,3 +46,8 @@ body:has(.voxel-home:not([hidden])) footer .audio-toggle{font-size:12px;min-heig
 body:has(.voxel-home:not([hidden])) button:focus-visible{outline:3px solid #fff;outline-offset:4px}
 @media(max-width:350px){#home .voxel-title{top:44px;font-size:17px}.voxel-menu{padding-left:5%;padding-right:5%}#home .mode-list{gap:6px}#home .mode{min-height:50px}#home .mode b{font-size:17px}.voxel-levels{gap:7px}#home #levels button,#home #extra-ten{min-height:48px;font-size:25px}#home #start{min-height:66px;font-size:30px}}
 @media(prefers-reduced-motion:reduce){#home .mode{transition:none}}
+/* Keep the complete illustration so the logo never covers the player's face. */
+#home .voxel-hero{aspect-ratio:4/5}
+#home .voxel-number{top:57%}
+.voxel-photo-shu{top:40.5%}
+.voxel-photo-sota{top:55.6%}
