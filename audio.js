@@ -74,5 +74,5 @@ const Voice = (()=>{
   }catch{notice('かんせいを さいせいできませんでした。');return false;}
  }
 
- return {setup,unlock,stop,play,chant,cheer,cheerText,crowd,localVoice,listVoices,goal,praise,save};
+ return {setup,unlock,stop,play,chant,cheer,cheerText,crowd,localVoice,listVoices,goal,praise,save,ready:()=>context?.state==='running'};
 })();

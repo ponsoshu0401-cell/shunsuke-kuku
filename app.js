@@ -1,6 +1,8 @@
 'use strict';
 const $=id=>document.getElementById(id);
 let state=freshState(),screen='home',mode='listen',selected=2,queue=[],position=0,current=null,phase='question',hadWrong=false,hintUsed=false,flow=0,continuous=false,listenPosition=0,listenPool=[],roundPool=[],isReview=false;
+let appReady=false,homeIntroPlayed=false;
+function playHomeIntro(){if(!appReady||screen!=='home'||homeIntroPlayed||!state.settings.voiceOn||!(state.settings.cheerVolume>0)||!Voice.ready?.())return;homeIntroPlayed=true;Voice.cheer('start');}
 let roundScore={goals:0,shots:0,saves:0};
 const photoURLs={};let recording=null,recordStarting=false;
 const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
@@ -46,16 +48,16 @@ async function playAll(){
 function stopAll(){flow++;continuous=false;Voice.stop();highlight(null);setText('play-all','ここから きく');}
 function beginGame(pool,review=false){
  if(!pool.length){go('home');return;}roundPool=[...pool];isReview=review;
- roundScore={goals:0,shots:0,saves:0};updateScore();queue=chooseQuestions(pool,state.settings.count,state.history);position=0;go('game');renderQuestion(true);
+ roundScore={goals:0,shots:0,saves:0};updateScore();queue=chooseQuestions(pool,state.settings.count,state.history);position=0;go('game');renderQuestion();
 }
-function renderQuestion(opening=false){
+function renderQuestion(){
  flow++;Voice.stop();const ticket=flow;current=queue[position];phase='question';hadWrong=false;hintUsed=false;
  $('stadium').classList.remove('shooting','saving');$('goal-banner').hidden=true;$('save-banner').hidden=true;$('repeat').disabled=false;$('confetti').replaceChildren();
  setText('game-mode',mode==='speak'?'つづきを いおう':isReview?'ふくしゅう':'くくシュート！');setText('counter',`${position+1} / ${queue.length}`);
  setText('question-guide',mode==='speak'?'こえに だして いってみよう':'つづきは なあに？');setText('equation',`${current.a} × ${current.b} = ？`);setText('reading',current.prompt+'…？');setText('feedback','');
  $('answers').hidden=mode==='speak';$('reveal').hidden=mode!=='speak';$('reveal').disabled=false;$('next').hidden=true;$('retry-tools').hidden=true;$('listen-help').hidden=true;
  renderChoices();if(typeof ShotMotion!=='undefined')ShotMotion.prepare();
- (async()=>{if(opening){await Voice.cheer('start');if(ticket!==flow)return;}await Voice.cheer('question');if(ticket!==flow)return;await Voice.chant(current,true);})();
+ (async()=>{await Voice.cheer('question');if(ticket!==flow)return;await Voice.chant(current,true);})();
 }
 function renderChoices(){
  const answer=current.value,values=new Set([answer]);const candidates=[answer-current.a,answer+current.a,answer+2*current.a,answer-1,answer+1].filter(n=>n>0&&n!==answer);
@@ -208,7 +210,7 @@ async function boot(){
  for(let n=1;n<=9;n++){const b=document.createElement('button');b.dataset.level=n;b.textContent=n;b.setAttribute('aria-label',`${n}のだん`);b.addEventListener('click',()=>selectLevel(n));$('levels').append(b);}
  document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>selectMode(b.dataset.mode)));$('extra-ten').addEventListener('click',()=>selectLevel(10));$('recommended').addEventListener('click',()=>selectLevel('recommended'));
  $('sound-toggle').addEventListener('click',()=>{Voice.unlock();const on=!(state.settings.voiceOn&&state.settings.goalSoundOn);state.settings.voiceOn=on;state.settings.goalSoundOn=on;state.settings.soundSetupV8=true;if(on){if(state.settings.studyVolume===0)state.settings.studyVolume=.65;if(state.settings.goalVolume===0)state.settings.goalVolume=.65;}Voice.stop();updateHome();persist();if(on)Voice.play('sound-check','ににんがし。','study');});
- $('start').addEventListener('click',()=>{Voice.unlock();if(mode==='listen'){openListen(poolForSelection());Voice.cheer('start');}else{beginGame(poolForSelection());}});
+ $('start').addEventListener('click',()=>{Voice.unlock();if(mode==='listen'){openListen(poolForSelection());}else{beginGame(poolForSelection());}});
  $('review').addEventListener('click',()=>{selectMode('quiz');Voice.unlock();beginGame(duePool(),true);});
  $('play-all').addEventListener('click',()=>{Voice.unlock();playAll();});$('stop-all').addEventListener('click',stopAll);
  $('learn-speed').addEventListener('change',()=>{stopAll();state.settings.speed=Number($('learn-speed').value);Voice.setup(state.settings);persist();});
@@ -239,10 +241,10 @@ async function boot(){
  $('persist-storage').addEventListener('click',async()=>{try{const ok=await navigator.storage?.persist?.();setText('persist-status',ok?'保存のリクエストが許可されました。データ消去に備えて原本も残してください。':'ブラウザーが管理します。永続保存の許可は得られませんでした。');}catch{setText('persist-status','この環境ではリクエストできません。');}});
  $('bgm-start')?.addEventListener('click',()=>{if(typeof BGM!=='undefined')BGM.unlock();});
  $('set-bgm-volume').addEventListener('input',()=>{state.settings.bgmVolume=Number($('set-bgm-volume').value);if(typeof BGM!=='undefined')BGM.setup(state.settings);});
- document.addEventListener('pointerdown',()=>Voice.unlock(),{passive:true});
+ for(const gesture of ['pointerdown','keydown'])document.addEventListener(gesture,()=>{Voice.unlock();setTimeout(playHomeIntro,0);},{passive:true});
  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&typeof BGM!=='undefined')BGM.unlock();if(document.hidden){if(typeof BGM!=='undefined')BGM.pause();flow++;continuous=false;Voice.stop();highlight(null);cancelRecording();if(phase==='solved')showNext();}});
  window.addEventListener('pagehide',()=>{Voice.stop();cancelRecording();});
- await refreshFace('shu');await refreshFace('sota');updateHome();if(typeof BGM!=='undefined')BGM.unlock();selectLevel(2);selectMode('listen');$('start').disabled=false;
+ await refreshFace('shu');await refreshFace('sota');updateHome();if(typeof BGM!=='undefined')BGM.unlock();selectLevel(2);selectMode('listen');$('start').disabled=false;appReady=true;Voice.unlock();setTimeout(playHomeIntro,0);
  try{const local=await Voice.localVoice();if(!local)setText('voice-status','こえが でないときは、おうちの ひとと おんせいを とうろくしてね。');}
  catch{setText('voice-status','こえを つかえません。がめんで あそべるよ。');}
 }
