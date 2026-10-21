@@ -1,7 +1,7 @@
 'use strict';
 // 更新時は v1 → v2 と変更。全ファイルを同じ版として保存します。
 const PREFIX='shunsuke-shoot:'+self.registration.scope+':';
-const CACHE=PREFIX+'v8';
+const CACHE=PREFIX+'v9';
 const ASSETS=['./','./index.html','./style.css','./data.js','./storage.js','./audio.js','./bundled-audio.js','./app.js','./pwa.js','./manifest.webmanifest','./audio/praise.mp3','./audio/save.mp3','./audio/goal.mp3','./audio/crowd.wav','./icons/stadium.svg','./icons/shu.svg','./icons/sota.svg','./icons/icon-192.png','./icons/icon-512.png','./icons/icon-maskable-512.png','./icons/apple-touch-icon.png'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS))));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith(PREFIX)&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));

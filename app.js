@@ -74,7 +74,7 @@ async function answerQuestion(value,button){
   $('retry-tools').hidden=true;$('listen-help').hidden=true;$('goal-banner').hidden=true;$('save-banner').hidden=true;
   $('stadium').classList.remove('shooting','saving');void $('stadium').offsetWidth;$('stadium').classList.add('saving');
   setText('feedback',state.settings.keeper+'が キャッチ！');
-  try{await wait(800);if(ticket!==flow)return;$('save-banner').hidden=false;await Voice.save();}
+  try{await wait(800);if(ticket!==flow)return;$('save-banner').hidden=false;recoverSave();await Voice.save();}
   finally{if(ticket===flow){recoverSave();}}
   return;
  }
@@ -83,7 +83,7 @@ async function answerQuestion(value,button){
  $('retry-tools').hidden=true;$('listen-help').hidden=true;$('save-banner').hidden=true;setText('equation',q.a+' × '+q.b+' = '+q.value);setText('reading',q.full);setText('feedback','せいかい！ シュート！');
  $('stadium').classList.remove('saving','shooting');void $('stadium').offsetWidth;$('stadium').classList.add('shooting');
  try{
-  await wait(850);if(ticket!==flow)return;$('goal-banner').hidden=false;makeConfetti();
+  await wait(850);if(ticket!==flow)return;$('goal-banner').hidden=false;makeConfetti();showNext();
   const goalPlayback=Voice.goal();await Voice.crowd();await goalPlayback;if(ticket!==flow)return;
   await Voice.praise();if(ticket!==flow)return;await Voice.chant(q);
  }finally{if(ticket===flow)showNext();}
