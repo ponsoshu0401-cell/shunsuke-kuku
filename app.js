@@ -6,7 +6,7 @@ const photoURLs={};let recording=null,recordStarting=false;
 const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 async function persist(){return Store.put('state',state);}
 function setText(id,text){$(id).textContent=text;}
-function go(name){$('native-audio-check')?.pause?.();flow++;continuous=false;Voice.stop();if(recording||recordStarting)cancelRecording();screen=name;document.body?.classList.toggle('game-active',name==='game');document.querySelectorAll('.screen').forEach(el=>el.hidden=el.id!==name);window.scrollTo({top:0,behavior:'instant'});}
+function go(name){$('native-audio-check')?.pause?.();flow++;continuous=false;Voice.stop();if(recording||recordStarting)cancelRecording();screen=name;if(typeof BGM!=='undefined'){BGM.screen(name);BGM.unlock();}document.body?.classList.toggle('game-active',name==='game');document.querySelectorAll('.screen').forEach(el=>el.hidden=el.id!==name);window.scrollTo({top:0,behavior:'instant'});}
 function poolForSelection(){return QUESTIONS.filter(q=>selected==='recommended'?[2,5,10].includes(q.a):q.a===selected);}
 function selectionLabel(){return selected==='recommended'?'おすすめ 2・5・10':`${selected}の だん`;}
 function duePool(){return QUESTIONS.filter(q=>state.history[q.id]?.due);}
@@ -17,7 +17,7 @@ function updateHome(){
  setText('hero-name',state.settings.name);setText('shirt-number',state.settings.number);setText('home-shirt-number',state.settings.number);
  document.querySelectorAll('[data-name]').forEach(el=>el.textContent=state.settings[el.dataset.name]);
  const soundOn=state.settings.voiceOn&&state.settings.goalSoundOn;setText('sound-toggle',soundOn?'🔊 おと ON':'🔇 おとをつける');$('sound-toggle').setAttribute('aria-pressed',String(soundOn));
- $('goal-voice-on').checked=state.settings.goalSoundOn;$('voice-on').checked=state.settings.voiceOn;Voice.setup(state.settings);
+ $('goal-voice-on').checked=state.settings.goalSoundOn;$('voice-on').checked=state.settings.voiceOn;Voice.setup(state.settings);if(typeof BGM!=='undefined')BGM.setup(state.settings);
 }
 function selectLevel(level){selected=level;document.querySelectorAll('[data-level]').forEach(button=>{const yes=Number(button.dataset.level)===level;button.classList.toggle('selected',yes);button.setAttribute('aria-pressed',String(yes));});$('recommended').classList.toggle('selected',level==='recommended');$('recommended').setAttribute('aria-pressed',String(level==='recommended'));setText('selection-note',level===10?'10の だんは「じゅう かける…」で よむよ。':selectionLabel());}
 function selectMode(next){mode=next;document.querySelectorAll('[data-mode]').forEach(button=>{const yes=button.dataset.mode===mode;button.classList.toggle('selected',yes);button.setAttribute('aria-pressed',String(yes));});}
@@ -97,7 +97,7 @@ function finishRound(){state.practice.rounds++;persist();go('finish');setText('f
 async function hint(){if(phase!=='question')return;hintUsed=true;const ticket=++flow;Voice.stop();setText('feedback','こえを きいて いってみよう。');setText('reading',current.full);await Voice.chant(current);if(ticket===flow&&phase==='question')setText('reading',current.prompt+'…？');}
 function loadSettingsForm(){
  const voiceSelect=$('set-voice');voiceSelect.replaceChildren();const standard=document.createElement('option');standard.value='';standard.textContent='自動で選ぶ（端末内の日本語音声）';voiceSelect.append(standard);for(const voice of Voice.listVoices?.()||[]){const option=document.createElement('option');option.value=voice.voiceURI;option.textContent=voice.name;voiceSelect.append(option);}voiceSelect.value=state.settings.voiceURI||'';
- const s=state.settings;for(const name of ['name','nick','number','keeper','count','speed'])$('set-'+name).value=s[name];$('set-study-volume').value=s.studyVolume;$('set-cheer-volume').value=s.cheerVolume;$('set-goal-volume').value=s.goalVolume;$('set-crowd-volume').value=s.crowdVolume;
+ const s=state.settings;for(const name of ['name','nick','number','keeper','count','speed'])$('set-'+name).value=s[name];$('set-study-volume').value=s.studyVolume;$('set-bgm-volume').value=s.bgmVolume;$('set-bgm-on').checked=s.bgmOn;$('set-cheer-volume').value=s.cheerVolume;$('set-goal-volume').value=s.goalVolume;$('set-crowd-volume').value=s.crowdVolume;
  $('cheer-editors').replaceChildren();for(const [key,label]of Object.entries(EVENT_LABELS)){const l=document.createElement('label');l.textContent=label;const text=document.createElement('textarea');text.id='cheer-'+key;text.maxLength=600;text.value=s.cheers[key].join('\n');l.append(text);$('cheer-editors').append(l);}
  setText('settings-status','');renderHistory();refreshAudioSlots();updateAudioTarget();
 }
@@ -109,7 +109,8 @@ async function saveSettings(event){
  if(Object.values(fields).some(value=>!value)||!/^\d{1,2}$/.test(number)){setText('settings-status','名前を入力し、背番号は0〜99の数字にしてください。');return false;}
  const s=state.settings;Object.assign(s,fields,{number,voiceURI:$('set-voice').value,gentleVoice:true});
  s.count=Number($('set-count').value);s.speed=Number($('set-speed').value);
- for(const key of ['study','cheer','goal','crowd'])s[key+'Volume']=Number($('set-'+key+'-volume').value);
+ s.bgmOn=$('set-bgm-on').checked;
+ for(const key of ['study','cheer','goal','crowd','bgm'])s[key+'Volume']=Number($('set-'+key+'-volume').value);
  for(const key of Object.keys(EVENT_LABELS))s.cheers[key]=$('cheer-'+key).value.split('\n').map(v=>v.trim()).filter(Boolean).slice(0,8);
  Voice.stop();updateHome();refreshAudioSlots();await updateAudioTarget();
  const ok=await persist();setText('settings-status',ok?'変更を反映し、この端末に保存しました。':'変更は反映しましたが、端末に保存できませんでした。');return true;
@@ -186,8 +187,9 @@ function safeState(saved){
  const s=saved.settings||{};for(const k of ['name','nick','keeper'])if(typeof s[k]==='string'&&s[k].trim())result.settings[k]=s[k].slice(0,20);
  if(/^\d{1,2}$/.test(s.number))result.settings.number=s.number;
  if([3,5,9].includes(s.count))result.settings.count=s.count;if([.65,.85,1,1.15].includes(s.speed))result.settings.speed=s.speed;
- for(const k of ['studyVolume','cheerVolume','goalVolume','crowdVolume'])if(Number.isFinite(s[k])&&s[k]>=0&&s[k]<=1)result.settings[k]=s[k];if(typeof s.voiceOn==='boolean')result.settings.voiceOn=s.voiceOn;
+ for(const k of ['studyVolume','cheerVolume','goalVolume','crowdVolume','bgmVolume'])if(Number.isFinite(s[k])&&s[k]>=0&&s[k]<=1)result.settings[k]=s[k];if(typeof s.voiceOn==='boolean')result.settings.voiceOn=s.voiceOn;
  if(!s.fluentVoiceV1&&result.settings.speed===.85)result.settings.speed=1;
+ if(typeof s.bgmOn==='boolean')result.settings.bgmOn=s.bgmOn;
  if(typeof s.goalSoundOn==='boolean')result.settings.goalSoundOn=s.goalSoundOn;
  if(!s.goalHugoV1){result.settings.goalSoundOn=true;if(result.settings.goalVolume===0)result.settings.goalVolume=.65;result.settings.crowdVolume=.4;}
  if(typeof s.voiceURI==='string')result.settings.voiceURI=s.voiceURI;
@@ -217,6 +219,8 @@ async function boot(){
  $('again').addEventListener('click',()=>{Voice.unlock();beginGame(isReview?(duePool().length?duePool():roundPool):roundPool,isReview);});
  $('open-parent').addEventListener('click',()=>{go('parents');loadSettingsForm();});$('settings-form').addEventListener('submit',saveSettings);$('settings-form').addEventListener('input',scheduleSettingsSave);$('settings-form').addEventListener('change',()=>saveSettings());
  $('test-goal').addEventListener('click',async()=>{Voice.unlock();if(!(await saveSettings()))return;setText('settings-status','ゴール音声と歓声を再生しています…');const playback=Voice.goal();await Voice.crowd();const ok=await playback;if(ok)await Voice.praise();setText('settings-status',ok?'再生を終了しました。聞こえない場合はゴール音声のONと端末の音量を確認してください。':'再生できませんでした。画面下の音声メッセージを確認してください。');});
+ $('test-bgm').addEventListener('click',async()=>{if(!(await saveSettings())||typeof BGM==='undefined')return;BGM.screen('game');BGM.unlock();setText('settings-status','BGMをためしています。とめるボタンで停止できます。');});
+ $('stop-bgm').addEventListener('click',()=>{if(typeof BGM!=='undefined'){BGM.screen(screen);BGM.pause();}setText('settings-status','BGMをとめました。');});
  $('test-save').addEventListener('click',async()=>{Voice.unlock();if(!(await saveSettings()))return;setText('settings-status','GKセーブの音声を再生しています…');const ok=await Voice.save();setText('settings-status',ok?'再生を終了しました。':'再生できませんでした。ゲームの音声ONと音量を確認してください。');});
  $('test-voice').addEventListener('click',async()=>{Voice.unlock();Voice.setup({...state.settings,voiceOn:true,voiceURI:$('set-voice').value,speed:Number($('set-speed').value),studyVolume:.6});try{await Voice.play('voice-preview','ににんがし。いっしょに、いってみよう。');}finally{Voice.setup(state.settings);}});
  $('goal-voice-on').addEventListener('change',()=>{state.settings.goalSoundOn=$('goal-voice-on').checked;Voice.stop();Voice.setup(state.settings);persist();});
@@ -232,7 +236,7 @@ async function boot(){
  $('clear-history').addEventListener('click',async()=>{if(confirm('学習記録をすべて消しますか？写真・録音・設定は残ります。')){const empty=freshState();state.history=empty.history;state.events=[];state.practice=empty.practice;await persist();renderHistory();updateHome();}});
  $('persist-storage').addEventListener('click',async()=>{try{const ok=await navigator.storage?.persist?.();setText('persist-status',ok?'保存のリクエストが許可されました。データ消去に備えて原本も残してください。':'ブラウザーが管理します。永続保存の許可は得られませんでした。');}catch{setText('persist-status','この環境ではリクエストできません。');}});
  document.addEventListener('pointerdown',()=>Voice.unlock(),{passive:true});
- document.addEventListener('visibilitychange',()=>{if(document.hidden){flow++;continuous=false;Voice.stop();highlight(null);cancelRecording();if(phase==='solved')showNext();}});
+ document.addEventListener('visibilitychange',()=>{if(document.hidden){if(typeof BGM!=='undefined')BGM.pause();flow++;continuous=false;Voice.stop();highlight(null);cancelRecording();if(phase==='solved')showNext();}});
  window.addEventListener('pagehide',()=>{Voice.stop();cancelRecording();});
  await refreshFace('shu');await refreshFace('sota');updateHome();selectLevel(2);selectMode('listen');$('start').disabled=false;
  try{const local=await Voice.localVoice();if(!local)setText('voice-status','こえが でないときは、おうちの ひとと おんせいを とうろくしてね。');}

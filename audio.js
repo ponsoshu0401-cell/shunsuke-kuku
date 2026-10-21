@@ -6,11 +6,12 @@ const Voice = (()=>{
  const synth=window.speechSynthesis;
  function setup(settings){config=settings;}
  function unlock(){
+  if(typeof BGM!=='undefined')BGM.unlock();
   try{if(typeof navigator!=='undefined'&&navigator.audioSession)navigator.audioSession.type='playback';}catch{}
   try{if(context?.state==='closed')context=null;context ||= new (window.AudioContext||window.webkitAudioContext)();if(context.state==='suspended'||context.state==='interrupted')context.resume().catch(()=>{});}catch{}
   try{synth?.getVoices();}catch{}
  }
- function stop(){serial++;for(const effect of effects){try{effect.stop();}catch{}}effects.clear();if(source){try{source.stop();}catch{}source=null;}if(synth)synth.cancel();if(finish){finish(false);finish=null;}utterance=null;}
+ function stop(){if(typeof BGM!=='undefined')BGM.duck(false);serial++;for(const effect of effects){try{effect.stop();}catch{}}effects.clear();if(source){try{source.stop();}catch{}source=null;}if(synth)synth.cancel();if(finish){finish(false);finish=null;}utterance=null;}
  function listVoices(){return synth?synth.getVoices().filter(v=>v.lang.startsWith('ja')&&v.localService):[];}
  function selectedVoice(){
   const voices=listVoices();const chosen=voices.find(v=>v.voiceURI===config.voiceURI);if(chosen)return chosen;
@@ -27,6 +28,10 @@ const Voice = (()=>{
  }
  function notice(text){for(const id of ['voice-status','game-voice-status']){const el=document.getElementById(id);if(el)el.textContent=text;}}
  async function play(key,text,kind='study'){
+  const task=playRaw(key,text,kind),token=serial;if(typeof BGM!=='undefined')BGM.duck(true);
+  try{return await task;}finally{if(token===serial&&typeof BGM!=='undefined')BGM.duck(false);}
+ }
+ async function playRaw(key,text,kind='study'){
   stop();const token=serial;
   const volume=kind==='goal'?(config.goalVolume??.65):kind==='study'?config.studyVolume:config.cheerVolume;
   if((kind==='goal'?!config.goalSoundOn:!config.voiceOn)||volume===0)return true;
