@@ -3,7 +3,7 @@
 const BGM=(()=>{
  let context,source,volume,buffer,settings={},page='home',ducked=false,previewing=false;
  function wanted(){return settings.bgmOn!==false&&(settings.bgmVolume??.5)>0&&(settings.voiceOn||settings.goalSoundOn)&&(['home','game','finish'].includes(page)||previewing)&&!document.hidden;}
- function updateButton(){const el=document.getElementById?.('bgm-start');if(el)el.hidden=page!=='home'||!wanted()||context?.state==='running';}
+ function updateButton(){const el=document.getElementById?.('bgm-start');if(el){el.hidden=page!=='home'||!wanted();el.textContent=context?.state==='running'?'BGM さいせいちゅう':'タップで BGMを つける';}}
  function level(){if(!volume||!context)return;const target=wanted()?(settings.bgmVolume??.5)*.75*(ducked?.22:1):0;volume.gain.setTargetAtTime(target,context.currentTime,.08);}
  function makeLoop(){
   const rate=22050,beat=60/76,length=beat*64,data=new Float32Array(Math.ceil(rate*length));
